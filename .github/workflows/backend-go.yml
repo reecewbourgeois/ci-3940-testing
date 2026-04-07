@@ -1,0 +1,41 @@
+name: CI - Go Backend
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/workflows/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6 # AI generated v4, but they are on v6: https://github.com/actions/checkout
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4 # AI generated v3, they are on v4: https://github.com/docker/setup-buildx-action
+
+      - name: Build Docker image
+        run: docker build -t backend-app ./backend
+
+      - name: Run container in background
+        run: docker run -d --rm -p 8081:8080 --name backend-app-container backend-app
+
+      - name: Wait for Go server to be ready and check response
+        run: |
+          for i in {1..5}; do
+            if curl -s http://localhost:8081 | grep -q 'Hello, World from Go backend!'; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "App did not start in time" && exit 1
+
+      - name: Stop container
+        if: always()
+        run: docker stop backend-app-container
