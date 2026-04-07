@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6 # AI generated v3, but they are on v6: https://github.com/actions/checkout
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3 # AI generated v3, they are on v4: https://github.com/docker/setup-buildx-action
 
       - name: Build Docker image
         run: docker build -t frontend-app ./frontend
